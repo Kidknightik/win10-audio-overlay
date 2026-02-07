@@ -15,7 +15,12 @@ Custom Windows 10–style audio OSD overlay for KDE Plasma. Shows volume and cur
 - Media info works for any player that exposes **MPRIS**. We use `playerctl` first for better compatibility.
 
 ## Install
-
+cloning repository
+```
+git clone https://github.com/Kidknightik/win10-audio-overlay
+cd win10-audio-overlay
+```
+installing
 ```
 ./scripts/install.sh
 ```

@@ -15,7 +15,12 @@ English version: [README.md](README.md)
 - Информация о музыке работает для любых плееров с **MPRIS**. В приоритете используется `playerctl`.
 
 ## Установка
-
+клонируем репозиторий:
+```
+git clone https://github.com/Kidknightik/win10-audio-overlay
+cd win10-audio-overlay
+```
+установка
 ```
 ./scripts/install.sh
 ```
