@@ -1,5 +1,7 @@
 # Win10 Audio OSD (KDE Plasma 6.5)
 
+English version: [README.md](README.md)
+
 Пример (как выглядит):
 
 ![Пример внешнего вида](example.png)

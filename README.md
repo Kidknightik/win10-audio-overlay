@@ -1,6 +1,6 @@
 # Win10 Audio OSD (KDE Plasma 6.5)
 
-Русская версия: `README.ru.md`
+Русская версия: [README.ru.md](README.ru.md)
 
 Example (how it looks):
 
