@@ -1,0 +1,11 @@
+[Unit]
+Description=Win10-style Audio OSD
+After=graphical-session.target
+
+[Service]
+Environment=QT_QPA_PLATFORM=xcb
+ExecStart=/usr/bin/python3 @ROOT@/src/win10_osd.py --daemon
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

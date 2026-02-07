@@ -1,0 +1,17 @@
+{
+  "width": 430,
+  "height": 150,
+  "timeout_ms": 1800,
+  "anchor": "top_left",
+  "margin_x": 24,
+  "margin_y": 24,
+  "background_color": "#DD1C1C1C",
+  "accent_color": "#00A4EF",
+  "text_color": "#F2F2F2",
+  "font_family": "Noto Sans",
+  "show_player": true,
+  "step_percent": 5,
+  "listen_pactl": true,
+  "listen_media": true,
+  "max_volume": 150
+}

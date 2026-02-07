@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CONFIG="$ROOT/config/config.json"
+
+SERVICE="com.github.win10osd"
+OBJ="/OSD"
+IFACE="com.github.win10osd"
+
+QDBUS=""
+if command -v qdbus6 >/dev/null 2>&1; then
+  QDBUS="qdbus6"
+elif command -v qdbus >/dev/null 2>&1; then
+  QDBUS="qdbus"
+elif command -v busctl >/dev/null 2>&1; then
+  QDBUS="busctl"
+else
+  echo "qdbus6/qdbus/busctl not found. Install qt6-tools or systemd." >&2
+  exit 1
+fi
+
+pactl_cmd() {
+  command -v pactl >/dev/null 2>&1 || { echo "pactl not found" >&2; exit 1; }
+  pactl "$@"
+}
+
+get_volume() {
+  pactl_cmd get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]\+%' | head -n1 | tr -d '%'
+}
+
+get_mute() {
+  local m
+  m=$(pactl_cmd get-sink-mute @DEFAULT_SINK@ | awk '{print $2}')
+  if [[ "$m" == "yes" ]]; then
+    echo "true"
+  else
+    echo "false"
+  fi
+}
+
+get_step() {
+  if command -v python >/dev/null 2>&1; then
+    python - <<PY
+import json
+try:
+    with open("$CONFIG","r",encoding="utf-8") as f:
+        data=json.load(f)
+    print(int(data.get("step_percent",5)))
+except Exception:
+    print(5)
+PY
+  else
+    echo 5
+  fi
+}
+
+show_osd() {
+  local vol mute
+  vol=$(get_volume)
+  mute=$(get_mute)
+  if [[ "$QDBUS" == "busctl" ]]; then
+    busctl --user call "$SERVICE" "$OBJ" "$IFACE" ShowVolume "ib" "$vol" "$mute" >/dev/null 2>&1 || true
+  else
+    $QDBUS "$SERVICE" "$OBJ" "$IFACE".ShowVolume "$vol" "$mute" >/dev/null 2>&1 || true
+  fi
+}
+
+STEP=$(get_step)
+
+case "${1:-}" in
+  --up)
+    pactl_cmd set-sink-volume @DEFAULT_SINK@ +${STEP}%
+    show_osd
+    ;;
+  --down)
+    pactl_cmd set-sink-volume @DEFAULT_SINK@ -${STEP}%
+    show_osd
+    ;;
+  --mute)
+    pactl_cmd set-sink-mute @DEFAULT_SINK@ toggle
+    show_osd
+    ;;
+  --set)
+    if [[ -z "${2:-}" ]]; then
+      echo "--set requires a percent value" >&2
+      exit 1
+    fi
+    pactl_cmd set-sink-volume @DEFAULT_SINK@ "${2}%"
+    show_osd
+    ;;
+  --show)
+    show_osd
+    ;;
+  *)
+    echo "Usage: win10-osd --up | --down | --mute | --set <percent> | --show" >&2
+    exit 1
+    ;;
+esac
